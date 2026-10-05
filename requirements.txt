@@ -1,0 +1,9 @@
+# InstaKDE – Python dependencies
+# Install with: pip install -r requirements.txt
+#
+# NOTE: On Fedora the PySide6 QtWebEngine add-ons are also available as system packages:
+#   sudo dnf install python3-pyside6 python3-pyside6-addons qt6-qtwebengine
+# -----------------------------------------------------------------------
+
+# Core Qt6 bindings with WebEngine support
+PySide6>=6.7.0

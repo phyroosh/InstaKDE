@@ -1,0 +1,26 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=InstaKDE
+GenericName=Instagram Client
+Comment=A native KDE desktop client for Instagram
+Exec=python3 /home/%u/.local/share/InstaKDE/app.py
+# If installed as a system package / pip console_scripts:
+# Exec=instakde
+Icon=instakde
+Terminal=false
+StartupWMClass=InstaKDE
+Categories=Network;InstantMessaging;
+Keywords=instagram;social;photos;reels;stories;direct;
+MimeType=
+Actions=NewDM;CheckFeed;
+
+[Desktop Action NewDM]
+Name=Open Direct Messages
+Icon=mail-message-new
+Exec=instakde --section=dms
+
+[Desktop Action CheckFeed]
+Name=Refresh Feed
+Icon=feed-subscribe
+Exec=instakde --section=home
