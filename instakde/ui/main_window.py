@@ -92,9 +92,10 @@ class MainWindow(QWidget):
             self._toggle_visibility()
 
     def closeEvent(self, event: QCloseEvent) -> None:
-        # If system tray is active, hide to tray instead of quitting
-        if self.tray and self.tray.isVisible():
+        # If system tray is active and available, hide to tray instead of quitting
+        if self.tray and self.tray.isVisible() and QSystemTrayIcon.isSystemTrayAvailable():
             self.hide()
             event.ignore()
         else:
             event.accept()
+            QApplication.instance().quit()

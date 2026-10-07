@@ -18,15 +18,44 @@ def setup_logging():
         ]
     )
 
+def setup_environment():
+    # 1. Preload full freeworld FFmpeg codecs (H.264 / HEVC) if available
+    import ctypes
+    candidate_codecs = [
+        str(config.BASE_DIR / "build_tools" / "codecs" / "libavcodec.so.62"),
+        "/usr/lib64/ffmpeg/libavcodec.so.62",
+        "/usr/lib/ffmpeg/libavcodec.so.62",
+    ]
+    for cpath in candidate_codecs:
+        if os.path.isfile(cpath):
+            try:
+                ctypes.CDLL(cpath, mode=ctypes.RTLD_GLOBAL)
+                logging.getLogger("instakde").info(f"[CODECS] Preloaded full media codec from {cpath}")
+                break
+            except Exception as e:
+                logging.getLogger("instakde").warning(f"[CODECS] Failed to preload {cpath}: {e}")
+
+    # 2. Configure Chromium flags for video autoplay and hardware acceleration
+    flags = [
+        "--autoplay-policy=no-user-gesture-required",
+        "--enable-features=VaapiVideoDecoder,CanvasOopRasterization",
+    ]
+    cur_flags = os.environ.get("QTWEBENGINE_CHROMIUM_FLAGS", "")
+    for f in flags:
+        if f not in cur_flags:
+            cur_flags = f"{cur_flags} {f}".strip()
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = cur_flags
+
+
 def main():
     setup_logging()
+    setup_environment()
 
     app = QApplication(sys.argv)
     app.setApplicationName(config.APP_NAME)
     app.setApplicationDisplayName(config.APP_NAME)
-    app.setDesktopFileName("org.kde.instakde")
+    app.setDesktopFileName("instakde")
     app.setWindowIcon(QIcon(str(config.LOGO_SVG)))
-    app.setQuitOnLastWindowClosed(False)
 
     window = MainWindow()
     window.show()

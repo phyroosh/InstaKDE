@@ -25,6 +25,12 @@ mkdir -p AppDir/usr/share/applications
 # Copy compiled executable and PySide6/Qt resources
 cp -r dist/instakde/* AppDir/usr/bin/
 
+# Bundle freeworld FFmpeg codecs (H.264 / HEVC) into AppDir
+if [ -d "build_tools/codecs" ]; then
+    echo "=== Bundling freeworld multimedia codecs (H.264/HEVC) into AppDir ==="
+    cp -a build_tools/codecs/* AppDir/usr/bin/_internal/
+fi
+
 # Copy icons and desktop entry
 cp instakde/assets/logo.svg AppDir/usr/share/icons/hicolor/scalable/apps/instakde.svg
 cp instakde/assets/logo.svg AppDir/instakde.svg
@@ -35,18 +41,18 @@ Version=1.0
 Type=Application
 Name=InstaKDE
 GenericName=Instagram Client
-Comment=A professional KDE desktop client for Instagram
+Comment=A professional desktop client for Instagram
 Exec=instakde
 Icon=instakde
 Terminal=false
-StartupWMClass=InstaKDE
+StartupWMClass=instakde
 Categories=Network;InstantMessaging;
 Keywords=instagram;social;photos;reels;stories;direct;
 EOF
 
 cp AppDir/instakde.desktop AppDir/usr/share/applications/
 
-# Create AppRun launcher with exact PySide6 6.11 QtWebEngine paths
+# Create AppRun launcher with exact PySide6 6.11 QtWebEngine paths and media flags
 cat << 'EOF' > AppDir/AppRun
 #!/bin/sh
 SELF=$(readlink -f "$0")
@@ -54,6 +60,7 @@ HERE=${SELF%/*}
 export PATH="${HERE}/usr/bin:${PATH}"
 export LD_LIBRARY_PATH="${HERE}/usr/bin/_internal:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
 export QTWEBENGINE_DISABLE_SANDBOX=1
+export QTWEBENGINE_CHROMIUM_FLAGS="--autoplay-policy=no-user-gesture-required ${QTWEBENGINE_CHROMIUM_FLAGS}"
 export QT_PLUGIN_PATH="${HERE}/usr/bin/_internal/PySide6/Qt/plugins"
 export QTWEBENGINE_RESOURCES_PATH="${HERE}/usr/bin/_internal/PySide6/Qt/resources"
 export QTWEBENGINE_LOCALES_PATH="${HERE}/usr/bin/_internal/PySide6/Qt/translations/qtwebengine_locales"
